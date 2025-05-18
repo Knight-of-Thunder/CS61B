@@ -1,5 +1,8 @@
 package ngrams;
 
+import edu.princeton.cs.algs4.In;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -31,6 +34,14 @@ public class TimeSeries extends TreeMap<Integer, Double> {
     public TimeSeries(TimeSeries ts, int startYear, int endYear) {
         super();
         // TODO: Fill in this constructor.
+        if(startYear > endYear){
+            throw new IllegalArgumentException("startYear > endYear");
+        }
+        for(int i = startYear; i <= endYear; i++){
+            if(ts.containsKey(i)){
+                this.put(i, ts.get(i));
+            }
+        }
     }
 
     /**
@@ -38,7 +49,7 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      */
     public List<Integer> years() {
         // TODO: Fill in this method.
-        return null;
+        return new ArrayList<>(this.keySet());
     }
 
     /**
@@ -47,7 +58,7 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      */
     public List<Double> data() {
         // TODO: Fill in this method.
-        return null;
+        return new ArrayList<>(this.values());
     }
 
     /**
@@ -61,7 +72,23 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      */
     public TimeSeries plus(TimeSeries ts) {
         // TODO: Fill in this method.
-        return null;
+        TimeSeries result = new TimeSeries();
+        for (Integer thisYear : this.keySet()){
+            for(Integer thatYear : ts.keySet()){
+                if(thisYear.equals(thatYear)){
+                    result.put(thisYear, this.get(thisYear) + ts.get(thatYear));
+                }
+            }
+        }
+        List<Integer> a1 = disjointYear(this, ts);
+        List<Integer> a2 = disjointYear(ts, this);
+        for(Integer year : a1){
+            result.put(year, this.get(year));
+        }
+        for(Integer year : a2){
+            result.put(year, ts.get(year));
+        }
+        return result;
     }
 
     /**
@@ -75,9 +102,28 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      */
     public TimeSeries dividedBy(TimeSeries ts) {
         // TODO: Fill in this method.
-        return null;
+        List<Integer> thisNots = disjointYear(this, ts);
+        if(!thisNots.isEmpty()){
+            throw new IllegalArgumentException("TS is missing years that exists in this TimeSeries");
+        }
+        TimeSeries result = new TimeSeries();
+        for(Integer year : this.keySet()){
+            result.put(year, this.get(year) / ts.get(year));
+        }
+        return result;
     }
 
     // TODO: Add any private helper methods.
     // TODO: Remove all TODO comments before submitting.
+
+    // Return the years exist in ts1 but not in ts2
+    private List<Integer> disjointYear(TimeSeries ts1, TimeSeries ts2){
+        List<Integer> result = new ArrayList<>();
+        for(Integer year : ts1.years()){
+            if(!ts2.containsKey(year)){
+                result.add(year);
+            }
+        }
+        return result;
+    }
 }

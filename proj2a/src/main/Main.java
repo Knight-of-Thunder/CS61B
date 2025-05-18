@@ -2,6 +2,7 @@ package main;
 
 import static utils.Utils.*;
 
+import ngrams.NGramMap;
 import org.slf4j.LoggerFactory;
 
 import browser.NgordnetServer;
@@ -22,8 +23,10 @@ public class Main {
         */
 
         hns.startUp();
-        hns.register("history", new DummyHistoryHandler());
-        hns.register("historytext", new DummyHistoryTextHandler());
+        hns.register("history", new HistoryHandler(new NGramMap(TOP_14337_WORDS_FILE,
+                TOTAL_COUNTS_FILE)));
+        hns.register("historytext", new HistoryTextHandler(new NGramMap(TOP_14337_WORDS_FILE,
+                TOTAL_COUNTS_FILE)));
 
         System.out.println("Finished server startup! Visit http://localhost:4567/ngordnet_2a.html");
     }
