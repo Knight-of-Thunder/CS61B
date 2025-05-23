@@ -1,6 +1,8 @@
 package main;
 
+import Ngodnet.WordNet;
 import browser.NgordnetQueryHandler;
+import ngrams.NGramMap;
 
 
 public class AutograderBuddy {
@@ -9,6 +11,8 @@ public class AutograderBuddy {
             String wordFile, String countFile,
             String synsetFile, String hyponymFile) {
 
-        throw new RuntimeException("Please fill out AutograderBuddy.java!");
+        WordNet wn = new WordNet(synsetFile, hyponymFile);
+        NGramMap ngm = new NGramMap(wordFile,countFile);
+        return new HyponymsHandler(wn, ngm);
     }
 }
