@@ -7,6 +7,7 @@ import tileengine.Tileset;
 import utils.FileUtils;
 
 import java.awt.event.KeyEvent;
+import java.io.FileWriter;
 import java.util.Random;
 
 /**
@@ -240,13 +241,52 @@ public class GameOfLife {
         // TODO: Implement this method so that the described transitions occur.
         // TODO: The current state is represented by TETiles[][] tiles and the next
         // TODO: state/evolution should be returned in TETile[][] nextGen.
-
-
-
-
+        for(int i = 0; i < width; i++){
+            for(int j = 0; j < height; j++){
+                nextGen[i][j] = ngrForItems(i, j, tiles);
+            }
+        }
         // TODO: Returns the next evolution in TETile[][] nextGen.
-        return null;
+        return nextGen;
     }
+
+    // check how many cells survive surround
+    private int checkSurround(int x, int y, TETile[][] tiles) {
+        int count = 0;
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                if (dx == 0 && dy == 0) continue;
+                int nx = x + dx;
+                int ny = y + dy;
+                if (nx >= 0 && nx < tiles.length && ny >= 0 && ny < tiles[0].length) {
+                    if (tiles[nx][ny] == Tileset.CELL) {
+                        count++;
+                    }
+                }
+            }
+        }
+        return count;
+    }
+
+    // update each item's next generation state
+    private TETile ngrForItems(int i, int j, TETile[][] tiles){
+        if(tiles[i][j] == Tileset.CELL){
+            return switch (checkSurround(i, j, tiles)) {
+                case 0, 1 -> Tileset.NOTHING;
+                case 2, 3 -> Tileset.CELL;
+                default -> Tileset.NOTHING;
+            };
+        }
+        else{
+            if(checkSurround(i, j, tiles) == 3){
+                return Tileset.CELL;
+            }
+            else {
+                return Tileset.NOTHING;
+            }
+        }
+    }
+
 
     /**
      * Helper method for saveBoard without rendering and running the game.
@@ -268,17 +308,26 @@ public class GameOfLife {
     public void saveBoard() {
         // TODO: Save the dimensions of the board into the first line of the file.
         // TODO: The width and height should be separated by a space, and end with "\n".
-
+        String filename = "src/save.txt";
+        StringBuilder content = new StringBuilder(width + " " + height + "\n");
+        for(int i = 0; i < height; i++){
+            for(int j = 0; j < width; j++){
+                if(currentState[j][height - 1 - i] == Tileset.CELL){
+                    content.append("1");
+                }
+                else {
+                    content.append("0");
+                }
+            }
+            content.append("\n");
+        }
 
 
         // TODO: Save the current state of the board into save.txt. You should
         // TODO: use the provided FileUtils functions to help you. Make sure
         // TODO: the orientation is correct! Each line in the board should
         // TODO: end with a new line character.
-
-
-
-
+        FileUtils.writeFile(filename, String.valueOf(content));
 
     }
 
@@ -288,14 +337,29 @@ public class GameOfLife {
      */
     public TETile[][] loadBoard(String filename) {
         // TODO: Read in the file.
-
+        String content = FileUtils.readFile(filename);
         // TODO: Split the file based on the new line character.
-
+        String[] contents = content.split("\n");
         // TODO: Grab and set the dimensions from the first line.
-
+        String[] dimensions = contents[0].split(" ");
+        width = Integer.parseInt(dimensions[0]);
+        height = Integer.parseInt(dimensions[1]);
         // TODO: Create a TETile[][] to load the board from the file into
         // TODO: and any additional variables that you think might help.
-
+        TETile[][] savedState = new TETile[width][height];
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                savedState[x][y] = Tileset.NOTHING;
+            }
+        }
+        for(int i = 1; i < height; i++){
+            for(int j = 0; j < width; j++){
+                if(contents[i].charAt(j) == '1'){
+                    savedState[j][i] = Tileset.CELL;
+                }
+                else savedState[j][i] = Tileset.NOTHING;
+            }
+        }
 
         // TODO: Load the state of the board from the given filename. You can
         // TODO: use the provided builder variable to help you and FileUtils
@@ -305,7 +369,7 @@ public class GameOfLife {
 
 
         // TODO: Return the board you loaded. Replace/delete this line.
-        return null;
+        return savedState;
     }
 
     /**
