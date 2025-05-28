@@ -18,8 +18,8 @@ public class AutograderBuddy {
      * @return the 2D TETile[][] representing the state of the world
      */
     public static TETile[][] getWorldFromInput(String input) {
+        return new World(Long.parseLong(input.substring(1, input.length() - 1))).getWorld();
 
-        throw new RuntimeException("Please fill out AutograderBuddy!");
 
     }
 
